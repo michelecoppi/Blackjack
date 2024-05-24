@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="game.css">
+    <title>Card Game</title>
+</head>
+<body class="bg-green-400">
+    <div class="min-h-screen flex flex-col justify-center items-center space-y-10">
+        <div class="flex flex-col items-center space-y-4">
+            <h1 class="text-2xl">Dealer</h1>
+            <div class="flex flex-row space-x-4 justify-center" id="dealer">
+               
+            </div>
+        </div>
+        <div class="flex flex-col items-center space-y-4">
+            <h1 class="text-2xl">Player</h1>
+            <div class="flex flex-row space-x-4 justify-center" id="player1">
+               
+            </div>
+        </div>
+        <div class="flex flex-row space-x-4">
+            <button id="draw" class="px-4 py-2 bg-red-500 text-white rounded">Draw card</button>
+            <button id="stay" class="px-4 py-2 bg-green-800 text-white rounded">Stay</button>
+        </div>
+        <div>
+            <button id="new_game" class="px-4 py-2 bg-yellow-800 text-white rounded hidden" >Play again</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
