@@ -24,25 +24,45 @@ class Game {
         this.newGame();
     }
 
-    newGame() {
+    async newGame() {
         this.player.reset();
         this.dealer.reset();
         this.deck.reset();
 
-        this.giveStartingCards(this.player);
-        this.giveStartingCards(this.dealer);
+        let aceCountPlayer = this.giveStartingCards(this.player);
+        let aceCountDealer = this.giveStartingCards(this.dealer);
 
         this.showCards(this.player);
         this.showCards(this.dealer);
 
+    setTimeout(() => {
+        
+        if(this.checkIfBlackjack(this.player)){
+            this.checkWinner();
+        }
+        if(this.checkIfBlackjack(this.dealer)){
+            this.checkWinner();
+        }
+
+        if (aceCountPlayer > 0) {
+            this.handleAces(aceCountPlayer, this.player);
+        }
+        if (aceCountDealer > 0) {
+            this.handleAces(aceCountDealer, this.dealer);
+        }
+    }, 100);
+
         this.updatePoints(this.player);
 
-        this.checkIfBlackjack(this.player);
-        
+        document.getElementById('player_name').classList.remove('hidden');
+        document.getElementById('dealer_name').classList.remove('hidden');
+
 
         document.getElementById('new_game').classList.add('hidden');
         document.getElementById('draw').classList.remove('hidden');
         document.getElementById('stay').classList.remove('hidden');
+
+       
     }
 
     checkIfBlackjack(player) {
@@ -56,19 +76,28 @@ class Game {
         });
 
         if (counter === 21) {
-            console.log(player.name + " got a blackjack");
-            setTimeout(() => this.checkWinner(), 2000);
+            return true;
         }
+        return false;
     }
 
     giveStartingCards(player) {
+        let aceCount = 0;
         for (let i = 0; i < 2; i++) {
             const card = this.deck.drawCard();
             let isAce = player.addCard(card);
             if (isAce) {
-                player.handleAce();
+                aceCount++;
             }
         }
+        return aceCount;
+    }
+
+    handleAces(aceCount, player) {
+        for (let i = 0; i < aceCount; i++) {
+            player.handleAce();
+        }
+        this.updatePoints(this.player);
     }
 
     drawCard(player) {
@@ -117,20 +146,36 @@ class Game {
     }
 
     checkWinner() {
-
-        if (this.player.points > 21) {
+        let resultText = document.getElementById('result');
+        if (this.checkIfBlackjack(this.player) && this.checkIfBlackjack(this.dealer)){
+            this.showDealerCard();
+            resultText.innerHTML = 'Dealer wins with a blackjack';
+            console.log('Dealer wins');
+        } else if (this.checkIfBlackjack(this.player)) {
+            this.showDealerCard();
+            resultText.innerHTML = 'Player wins with a blackjack';
+            console.log('Player1 wins');
+        } else if (this.checkIfBlackjack(this.dealer)) {
+            this.showDealerCard();
+            resultText.innerHTML = 'Dealer wins with a blackjack';
+            console.log('Dealer wins');
+        } else if (this.player.points > 21) {
+            resultText.innerHTML = 'Dealer wins cause player busted';
             console.log('Dealer wins');
         } else if (this.dealer.points > 21) {
+            resultText.innerHTML = 'Player wins cause the dealer busted';
             console.log('Player1 wins');
         } else if (this.player.points > this.dealer.points) {
+            resultText.innerHTML = `Player wins with ${this.player.points} points against ${this.dealer.points} points`;
             console.log('Player1 wins');
         } else if (this.player.points < this.dealer.points) {
+            resultText.innerHTML = `Dealer wins with ${this.dealer.points} points against ${this.player.points} points`;
             console.log('Dealer wins');
-        } else {
+        } else{
+            resultText.innerHTML = `It is a draw with ${this.player.points} points`;
             console.log('It is a draw');
         }
-
-        this.resetGame();
+        setTimeout(() => this.resetGame(), 3000);
     }
 
     resetGame() {
@@ -141,20 +186,34 @@ class Game {
         document.getElementById('dealer').innerHTML = '';
 
         document.getElementById('player_points').textContent = '';
+        document.getElementById('dealer_points').textContent = '';
+
+        document.getElementById('result').innerHTML = '';
+
+        document.getElementById('player_name').classList.add('hidden');
+        document.getElementById('dealer_name').classList.add('hidden');
         
 
         document.getElementById('new_game').classList.remove('hidden');
-        document.getElementById('draw').classList.add('hidden');
-        document.getElementById('stay').classList.add('hidden');
+
+        let draw = document.getElementById('draw');
+        draw.classList.add('hidden');
+        draw.removeAttribute('disabled');
+        
+        let stay = document.getElementById('stay');
+        stay.classList.add('hidden');
+        stay.removeAttribute('disabled');
     }
 
     dealerTurn() {
-        let divDealer = document.getElementById('dealer').firstElementChild;
-        divDealer.src = this.dealer.cards[0].src;
+        this.showDealerCard();
+        this.updatePoints(this.dealer);
+
 
         const drawCards = () => {
             if (this.dealer.points < 17) {
                 this.drawCard(this.dealer);
+                this.updatePoints(this.dealer);
                 setTimeout(drawCards, 2000);
             } else {
                 this.checkWinner();
@@ -162,6 +221,11 @@ class Game {
         };
     
         setTimeout(drawCards, 2000);
+    }
+
+    showDealerCard() {
+        let divDealer = document.getElementById('dealer').firstElementChild;
+        divDealer.src = this.dealer.cards[0].src;
     }
 
     updatePoints(player) {

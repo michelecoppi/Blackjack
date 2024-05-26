@@ -2,8 +2,6 @@ import Game from './game.js';
 
 let game = new Game();
 
-// gestire meglio l'evento dell'asso
-// aggiungere il blackjack
 
 
 window.onload = function () {
@@ -22,5 +20,7 @@ drawBtn.addEventListener('click', function () {
 
 let stayBtn = document.getElementById('stay');
 stayBtn.addEventListener('click', function () {
+    stayBtn.setAttribute('disabled', true);
+    drawBtn.setAttribute('disabled', true);
     game.dealerTurn();
 });
