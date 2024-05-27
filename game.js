@@ -35,43 +35,42 @@ class Game {
         this.showCards(this.player);
         this.showCards(this.dealer);
 
-    setTimeout(() => {
-        
-        if(this.checkIfBlackjack(this.player)){
+        if (this.checkIfBlackjack(this.player)) {
             this.checkWinner();
-        }
-        if(this.checkIfBlackjack(this.dealer)){
+        }else if (this.checkIfBlackjack(this.dealer)) {
             this.checkWinner();
+        } else {
+
+            setTimeout(() => {
+
+                if (aceCountPlayer > 0) {
+                    this.handleAces(aceCountPlayer, this.player);
+                }
+                if (aceCountDealer > 0) {
+                    this.handleAces(aceCountDealer, this.dealer);
+                }
+            }, 100);
+
+            this.updatePoints(this.player);
+
+            document.getElementById('player_name').classList.remove('hidden');
+            document.getElementById('dealer_name').classList.remove('hidden');
+
+
+            document.getElementById('new_game').classList.add('hidden');
+            document.getElementById('draw').classList.remove('hidden');
+            document.getElementById('stay').classList.remove('hidden');
+
         }
-
-        if (aceCountPlayer > 0) {
-            this.handleAces(aceCountPlayer, this.player);
-        }
-        if (aceCountDealer > 0) {
-            this.handleAces(aceCountDealer, this.dealer);
-        }
-    }, 100);
-
-        this.updatePoints(this.player);
-
-        document.getElementById('player_name').classList.remove('hidden');
-        document.getElementById('dealer_name').classList.remove('hidden');
-
-
-        document.getElementById('new_game').classList.add('hidden');
-        document.getElementById('draw').classList.remove('hidden');
-        document.getElementById('stay').classList.remove('hidden');
-
-       
     }
 
     checkIfBlackjack(player) {
-        
-        if(player.cards.length > 2){
+
+        if (player.cards.length > 2) {
             return false;
         }
         return (this.isAce(player.cards[0]) && this.isValueTenCard(player.cards[1])) ||
-                (this.isAce(player.cards[1]) && this.isValueTenCard(player.cards[0]));
+            (this.isAce(player.cards[1]) && this.isValueTenCard(player.cards[0]));
     }
 
     giveStartingCards(player) {
@@ -98,7 +97,7 @@ class Game {
         let isAce = player.addCard(card);
         this.showCard(card, document.getElementById(player.name));
         if (isAce) {
-                player.handleAce();
+            player.handleAce();
         }
         if (player.name === "player") {
             this.updatePoints(player);
@@ -140,7 +139,7 @@ class Game {
 
     checkWinner() {
         let resultText = document.getElementById('result');
-        if (this.checkIfBlackjack(this.player) && this.checkIfBlackjack(this.dealer)){
+        if (this.checkIfBlackjack(this.player) && this.checkIfBlackjack(this.dealer)) {
             this.showDealerCard();
             resultText.innerHTML = 'Dealer wins with a blackjack';
             console.log('Dealer wins');
@@ -164,7 +163,7 @@ class Game {
         } else if (this.player.points < this.dealer.points) {
             resultText.innerHTML = `Dealer wins with ${this.dealer.points} points against ${this.player.points} points`;
             console.log('Dealer wins');
-        } else{
+        } else {
             resultText.innerHTML = `It is a draw with ${this.player.points} points`;
             console.log('It is a draw');
         }
@@ -185,14 +184,14 @@ class Game {
 
         document.getElementById('player_name').classList.add('hidden');
         document.getElementById('dealer_name').classList.add('hidden');
-        
+
 
         document.getElementById('new_game').classList.remove('hidden');
 
         let draw = document.getElementById('draw');
         draw.classList.add('hidden');
         draw.removeAttribute('disabled');
-        
+
         let stay = document.getElementById('stay');
         stay.classList.add('hidden');
         stay.removeAttribute('disabled');
@@ -212,7 +211,7 @@ class Game {
                 this.checkWinner();
             }
         };
-    
+
         setTimeout(drawCards, 2000);
     }
 
@@ -222,12 +221,12 @@ class Game {
     }
 
     updatePoints(player) {
-        document.getElementById(`${player.name}_points`).textContent= `${player.points} points`;
+        document.getElementById(`${player.name}_points`).textContent = `${player.points} points`;
     }
-    isValueTenCard(card){
+    isValueTenCard(card) {
         return card.value === '10' || card.value === 'J' || card.value === 'Q' || card.value === 'K';
     }
-    isAce(card){
+    isAce(card) {
         return card.value === 'A';
     }
 }
