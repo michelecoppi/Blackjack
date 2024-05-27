@@ -66,19 +66,12 @@ class Game {
     }
 
     checkIfBlackjack(player) {
-        let counter = 0;
-        player.cards.forEach(card => {
-            if (card.value === 'A') {
-                counter+=11;
-            } else if (card.value === 'J' || card.value === 'Q' || card.value === 'K') {
-                counter+=10;
-            }
-        });
-
-        if (counter === 21) {
-            return true;
+        
+        if(player.cards.length > 2){
+            return false;
         }
-        return false;
+        return (this.isAce(player.cards[0]) && this.isValueTenCard(player.cards[1])) ||
+                (this.isAce(player.cards[1]) && this.isValueTenCard(player.cards[0]));
     }
 
     giveStartingCards(player) {
@@ -230,6 +223,12 @@ class Game {
 
     updatePoints(player) {
         document.getElementById(`${player.name}_points`).textContent= `${player.points} points`;
+    }
+    isValueTenCard(card){
+        return card.value === '10' || card.value === 'J' || card.value === 'Q' || card.value === 'K';
+    }
+    isAce(card){
+        return card.value === 'A';
     }
 }
 

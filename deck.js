@@ -1,4 +1,5 @@
 class Deck {
+
     constructor(cards) {
         this.cards = cards.map(card => ({ ...card }));
         this.cardsCopy = this.cards.map(card => ({ ...card }));
