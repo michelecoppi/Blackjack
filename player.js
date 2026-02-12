@@ -3,6 +3,7 @@ class Player {
         this.name = name;
         this.points = 0;
         this.cards = [];
+        this.softAces = 0;
     }
 
     addCard(card) {
@@ -13,35 +14,30 @@ class Player {
     calculateCardValue(card) {
         const cardValue = card.value;
         if (cardValue === "A") {
-            return true; 
+            this.points += 11;
+            this.softAces += 1;
+            this.adjustForAces();
+            return true;
         } else if (cardValue === "J" || cardValue === "Q" || cardValue === "K") {
             this.points += 10;
         } else {
             this.points += Number(cardValue);
         }
+        this.adjustForAces();
         return false; 
     }
 
-    handleAce() {
-        if (this.name === "player") {
-            let aceValue = prompt("1 or 11?");
-            while (aceValue !== "1" && aceValue !== "11") {
-                aceValue = prompt("Please enter 1 or 11");
-            }
-            this.points += Number(aceValue);
-        } else if (this.name === "dealer") {
-            
-            if (this.points + 11 > 21) {
-                this.points += 1;
-            } else {
-                this.points += 11;
-            }
+    adjustForAces() {
+        while (this.points > 21 && this.softAces > 0) {
+            this.points -= 10;
+            this.softAces -= 1;
         }
     }
 
     reset() {
         this.points = 0;
         this.cards = [];
+        this.softAces = 0;
     }
 }
 
