@@ -29,33 +29,19 @@ class Game {
         this.dealer.reset();
         this.deck.reset();
 
-        let aceCountPlayer = this.giveStartingCards(this.player);
-        let aceCountDealer = this.giveStartingCards(this.dealer);
+        this.giveStartingCards(this.player);
+        this.giveStartingCards(this.dealer);
 
         this.showCards(this.player);
         this.showCards(this.dealer);
 
-        if (this.checkIfBlackjack(this.player)) {
-            this.checkWinner();
-        }else if (this.checkIfBlackjack(this.dealer)) {
+        if (this.checkIfBlackjack(this.player) || this.checkIfBlackjack(this.dealer)) {
             this.checkWinner();
         } else {
-
-            setTimeout(() => {
-
-                if (aceCountPlayer > 0) {
-                    this.handleAces(aceCountPlayer, this.player);
-                }
-                if (aceCountDealer > 0) {
-                    this.handleAces(aceCountDealer, this.dealer);
-                }
-            }, 100);
-
             this.updatePoints(this.player);
 
             document.getElementById('player_name').classList.remove('hidden');
             document.getElementById('dealer_name').classList.remove('hidden');
-
 
             document.getElementById('new_game').classList.add('hidden');
             document.getElementById('draw').classList.remove('hidden');
@@ -74,31 +60,17 @@ class Game {
     }
 
     giveStartingCards(player) {
-        let aceCount = 0;
         for (let i = 0; i < 2; i++) {
             const card = this.deck.drawCard();
-            let isAce = player.addCard(card);
-            if (isAce) {
-                aceCount++;
-            }
+            player.addCard(card);
         }
-        return aceCount;
     }
 
-    handleAces(aceCount, player) {
-        for (let i = 0; i < aceCount; i++) {
-            player.handleAce();
-        }
-        this.updatePoints(this.player);
-    }
 
     drawCard(player) {
         const card = this.deck.drawCard();
-        let isAce = player.addCard(card);
+        player.addCard(card);
         this.showCard(card, document.getElementById(player.name));
-        if (isAce) {
-            player.handleAce();
-        }
         if (player.name === "player") {
             this.updatePoints(player);
             this.checkIfBust(player);
@@ -132,7 +104,9 @@ class Game {
 
     checkIfBust(player) {
         if (player.points > 21) {
-            console.log(player.name + " are busted");
+            console.log(`${player.name} busted`);
+            document.getElementById('draw').setAttribute('disabled', true);
+            document.getElementById('stay').setAttribute('disabled', true);
             setTimeout(() => this.checkWinner(), 2000);
         }
     }
@@ -141,25 +115,25 @@ class Game {
         let resultText = document.getElementById('result');
         if (this.checkIfBlackjack(this.player) && this.checkIfBlackjack(this.dealer)) {
             this.showDealerCard();
-            resultText.innerHTML = 'Dealer wins with a blackjack';
-            console.log('Dealer wins');
+            resultText.innerHTML = 'Push: both have blackjack';
+            console.log('Push');
         } else if (this.checkIfBlackjack(this.player)) {
             this.showDealerCard();
             resultText.innerHTML = 'Player wins with a blackjack';
-            console.log('Player1 wins');
+            console.log('Player wins');
         } else if (this.checkIfBlackjack(this.dealer)) {
             this.showDealerCard();
             resultText.innerHTML = 'Dealer wins with a blackjack';
             console.log('Dealer wins');
         } else if (this.player.points > 21) {
-            resultText.innerHTML = 'Dealer wins cause player busted';
+            resultText.innerHTML = 'Dealer wins because player busted';
             console.log('Dealer wins');
         } else if (this.dealer.points > 21) {
-            resultText.innerHTML = 'Player wins cause the dealer busted';
-            console.log('Player1 wins');
+            resultText.innerHTML = 'Player wins because dealer busted';
+            console.log('Player wins');
         } else if (this.player.points > this.dealer.points) {
             resultText.innerHTML = `Player wins with ${this.player.points} points against ${this.dealer.points} points`;
-            console.log('Player1 wins');
+            console.log('Player wins');
         } else if (this.player.points < this.dealer.points) {
             resultText.innerHTML = `Dealer wins with ${this.dealer.points} points against ${this.player.points} points`;
             console.log('Dealer wins');
@@ -221,7 +195,8 @@ class Game {
     }
 
     updatePoints(player) {
-        document.getElementById(`${player.name}_points`).textContent = `${player.points} points`;
+        let softLabel = player.softAces > 0 ? " (soft)" : "";
+        document.getElementById(`${player.name}_points`).textContent = `${player.points} points${softLabel}`;
     }
     isValueTenCard(card) {
         return card.value === '10' || card.value === 'J' || card.value === 'Q' || card.value === 'K';
